@@ -1,8 +1,8 @@
 # image-syncer
 
-[![CircleCI](https://circleci.com/gh/AliyunContainerService/image-syncer.svg?style=svg)](https://circleci.com/gh/AliyunContainerService/image-syncer)
-[![Go Report Card](https://goreportcard.com/badge/github.com/AliyunContainerService/image-syncer)](https://goreportcard.com/report/github.com/AliyunContainerService/image-syncer)
-[![codecov](https://codecov.io/gh/AliyunContainerService/image-syncer/graph/badge.svg)](https://codecov.io/gh/AliyunContainerService/image-syncer)
+[![CircleCI](https://circleci.com/gh/gzzchh/image-syncer.svg?style=svg)](https://circleci.com/gh/gzzchh/image-syncer)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gzzchh/image-syncer)](https://goreportcard.com/report/github.com/gzzchh/image-syncer)
+[![codecov](https://codecov.io/gh/gzzchh/image-syncer/graph/badge.svg)](https://codecov.io/gh/gzzchh/image-syncer)
 
 `image-syncer` is a docker registry tools. With `image-syncer` you can synchronize docker images from some source registries to target registries, which include most popular public docker registry services.
 
@@ -22,13 +22,13 @@ English | [简体中文](./README-zh_CN.md)
 
 ### Install image-syncer
 
-You can download latest binary release [here](https://github.com/AliyunContainerService/image-syncer/releases)
+You can download latest binary release [here](https://github.com/gzzchh/image-syncer/releases)
 
 ### Compile Manually
 
 ```
-go get github.com/AliyunContainerService/image-syncer
-cd $GOPATH/github.com/AliyunContainerService/image-syncer
+go get github.com/gzzchh/image-syncer
+cd $GOPATH/github.com/gzzchh/image-syncer
 
 # This will create a binary file named image-syncer
 make

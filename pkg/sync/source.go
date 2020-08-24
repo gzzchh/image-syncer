@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/AliyunContainerService/image-syncer/pkg/tools"
+	"github.com/gzzchh/image-syncer/pkg/tools"
 	"github.com/containers/image/docker"
 	"github.com/containers/image/types"
 )

@@ -6,7 +6,7 @@ jobs:
   build:
     docker:
     - image: circleci/golang:1.10
-    working_directory: /go/src/github.com/AliyunContainerService/image-syncer
+    working_directory: /go/src/github.com/gzzchh/image-syncer
     steps:
     - checkout
     - run:
@@ -27,7 +27,7 @@ jobs:
   code-check:
     docker:
       - image: sunyuan3/gometalinter:v1
-    working_directory: /go/src/github.com/AliyunContainerService/image-syncer
+    working_directory: /go/src/github.com/gzzchh/image-syncer
     steps:
       - checkout
       - run:
@@ -49,7 +49,7 @@ jobs:
   markdown-spellcheck:
     docker:
         - image: sunyuan3/markdown-spellcheck:v1
-    working_directory: /go/src/github.com/AliyunContainerService/image-syncer
+    working_directory: /go/src/github.com/gzzchh/image-syncer
     steps:
       - checkout
       - run:

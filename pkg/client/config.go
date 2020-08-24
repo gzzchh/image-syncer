@@ -30,6 +30,7 @@ type Auth struct {
 	Username string `json:"username" yaml:"username"`
 	Password string `json:"password" yaml:"password"`
 	Insecure bool   `json:"insecure" yaml:"insecure"`
+	UseEnv   bool   `json:"useEnv" yaml:"useEnv"`
 }
 
 // NewSyncConfig creates a Config struct
@@ -46,17 +47,25 @@ func NewSyncConfig(configFile, authFilePath, imageFilePath, defaultDestRegistry,
 	var config Config
 
 	if len(configFile) != 0 {
-		if err := openAndDecode(configFile, &config); err != nil {
+		if err := decodeConfig(configFile, &config); err != nil {
 			return nil, fmt.Errorf("decode config file %v failed, error %v", configFile, err)
 		}
 	} else {
 		if len(authFilePath) != 0 {
-			if err := openAndDecode(authFilePath, &config.AuthList); err != nil {
+			if err := decodeConfig(authFilePath, &config.AuthList); err != nil {
 				return nil, fmt.Errorf("decode auth file %v error: %v", authFilePath, err)
+			}
+			// fix the UseEnv
+			for i := range config.AuthList {
+				account := config.AuthList[i]
+				if account.UseEnv == true {
+					account.Username = os.Getenv(account.Username)
+					account.Password = os.Getenv(account.Password)
+				}
 			}
 		}
 
-		if err := openAndDecode(imageFilePath, &config.ImageList); err != nil {
+		if err := decodeConfig(imageFilePath, &config.ImageList); err != nil {
 			return nil, fmt.Errorf("decode image file %v error: %v", imageFilePath, err)
 		}
 	}
@@ -68,7 +77,7 @@ func NewSyncConfig(configFile, authFilePath, imageFilePath, defaultDestRegistry,
 }
 
 // Open json file and decode into target interface
-func openAndDecode(filePath string, target interface{}) error {
+func decodeConfig(filePath string, target interface{}) error {
 	if !strings.HasSuffix(filePath, ".yaml") &&
 		!strings.HasSuffix(filePath, ".yml") &&
 		!strings.HasSuffix(filePath, ".json") {
@@ -97,7 +106,7 @@ func openAndDecode(filePath string, target interface{}) error {
 	}
 
 	return nil
-}
+} // Decode For Auth Config
 
 // GetAuth gets the authentication information in Config
 func (c *Config) GetAuth(registry string, namespace string) (Auth, bool) {

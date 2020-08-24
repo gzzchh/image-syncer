@@ -45,7 +45,6 @@ func NewSyncConfig(configFile, authFilePath, imageFilePath, defaultDestRegistry,
 	}
 
 	var config Config
-
 	if len(configFile) != 0 {
 		if err := decodeConfig(configFile, &config); err != nil {
 			return nil, fmt.Errorf("decode config file %v failed, error %v", configFile, err)
@@ -56,13 +55,20 @@ func NewSyncConfig(configFile, authFilePath, imageFilePath, defaultDestRegistry,
 				return nil, fmt.Errorf("decode auth file %v error: %v", authFilePath, err)
 			}
 			// fix the UseEnv
+			//config.AuthList = getCredentialFromEnv(config.AuthList)
+			//tempAuthList:=make(map[string]*Auth)
 			for i := range config.AuthList {
 				account := config.AuthList[i]
+				//fmt.Println(account.Username)
 				if account.UseEnv == true {
-					account.Username = os.Getenv(account.Username)
-					account.Password = os.Getenv(account.Password)
+					account.Username = os.Getenv(config.AuthList[i].Username)
+					account.Password = os.Getenv(config.AuthList[i].Password)
 				}
+				config.AuthList[i] = account
+				//tempAuthList[i].Insecure=account.Insecure
+				//tempAuthList[i].UseEnv=account.UseEnv
 			}
+			//fmt.Println(config.AuthList)
 		}
 
 		if err := decodeConfig(imageFilePath, &config.ImageList); err != nil {
@@ -106,8 +112,22 @@ func decodeConfig(filePath string, target interface{}) error {
 	}
 
 	return nil
-} // Decode For Auth Config
+}
 
+// Decode For Auth Config in Env Mode
+//func (AuthList )getCredentialFromEnv(target interface{})error  {
+//	tempAuthList:=make(map[string]*Auth)
+//	for i := range target {
+//		account := target[i]
+//		if account.UseEnv == true {
+//			tempAuthList[i].Username = os.Getenv(account.Username)
+//			tempAuthList[i].Password = os.Getenv(account.Password)
+//		}
+//		tempAuthList[i].Insecure=account.Insecure
+//		tempAuthList[i].UseEnv=account.UseEnv
+//	}
+//
+//}
 // GetAuth gets the authentication information in Config
 func (c *Config) GetAuth(registry string, namespace string) (Auth, bool) {
 	// key of each AuthList item can be "registry/namespace" or "registry" only

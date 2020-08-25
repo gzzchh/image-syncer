@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/containers/image/v5/docker"
+	"github.com/containers/image/v5/types"
 	"github.com/gzzchh/image-syncer/pkg/tools"
-	"github.com/containers/image/docker"
-	"github.com/containers/image/types"
 )
 
 // ImageSource is a reference to a remote image need to be pulled.
@@ -21,6 +21,7 @@ type ImageSource struct {
 	registry   string
 	repository string
 	tag        string
+	digest     string
 }
 
 // NewImageSource generates a PullTask by repository, the repository string must include "tag",
@@ -82,6 +83,7 @@ func NewImageSource(registry, repository, tag, username, password string, insecu
 
 // GetManifest get manifest file from source image
 func (i *ImageSource) GetManifest() ([]byte, string, error) {
+	//fmt.Println("ctx:", i.ctx)
 	if i.source == nil {
 		return nil, "", fmt.Errorf("cannot get manifest file without specfied a tag")
 	}
@@ -94,11 +96,13 @@ func (i *ImageSource) GetBlobInfos(manifestByte []byte, manifestType string) ([]
 		return nil, fmt.Errorf("cannot get blobs without specfied a tag")
 	}
 
-	manifestInfo, digests, err := ManifestHandler(manifestByte, manifestType)
+	manifestInfo, digests, err := ManifestHandler(manifestByte, manifestType, i)
 	if err != nil {
 		return nil, err
 	}
-
+	//fmt.Println("manifestByte: ",string(manifestByte))
+	//fmt.Println("mainfest:",manifestInfo)
+	//fmt.Println("digest",digests)
 	if digests != nil {
 		// TODO: manifest list support
 		return nil, fmt.Errorf("manifest list is not supported right now")

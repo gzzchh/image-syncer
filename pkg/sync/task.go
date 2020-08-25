@@ -3,7 +3,9 @@ package sync
 import (
 	"fmt"
 
-	"github.com/containers/image/pkg/blobinfocache/none"
+	"github.com/containers/image/v5/manifest"
+
+	"github.com/containers/image/v5/pkg/blobinfocache/none"
 	"github.com/sirupsen/logrus"
 )
 
@@ -36,7 +38,9 @@ func NewTask(source *ImageSource, destination *ImageDestination, logger *logrus.
 // Run is the main function of a sync task
 func (t *Task) Run() error {
 	// get manifest from source
+	// 必须是带层的信息
 	manifestByte, manifestType, err := t.source.GetManifest()
+	//fmt.Println(manifestType)
 	if err != nil {
 		return t.Errorf("Failed to get manifest from %s/%s:%s error: %v", t.source.GetRegistry(), t.source.GetRepository(), t.source.GetTag(), err)
 	}
@@ -72,14 +76,33 @@ func (t *Task) Run() error {
 			// print the log of ignored blob
 			t.Infof("Blob %s(%v) has been pushed to %s, will not be pulled", b.Digest, b.Size, t.destination.GetRegistry()+"/"+t.destination.GetRepository())
 		}
-	}
 
+	}
+	// DO NOT Push manifest list
+	if manifestType == manifest.DockerV2ListMediaType {
+		manifestInfo, err := manifest.Schema2ListFromManifest(manifestByte)
+		if err != nil {
+			return err
+		}
+		for _, item := range manifestInfo.Manifests {
+			// 暂时至支持X86_64架构的镜像同步
+			if item.Platform.Architecture == "amd64" {
+				//fmt.Println("newCtx:", i.ctx)
+				//fmt.Println("newDigest:", item.Digest)
+				// 用指定Arch的Digest再拉一次针对该Digest的多层Manifest
+				manifestByte, manifestType, err = t.source.source.GetManifest(t.source.ctx,&item.Digest)
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
 	// push manifest to destination
+	// 这里只能写入 镜像层的信息,如果是多Arch镜像必须修改
 	if err := t.destination.PushManifest(manifestByte); err != nil {
 		return t.Errorf("Put manifest to %s/%s:%s error: %v", t.destination.GetRegistry(), t.destination.GetRepository(), t.destination.GetTag(), err)
 	}
 	t.Infof("Put manifest to %s/%s:%s", t.destination.GetRegistry(), t.destination.GetRepository(), t.destination.GetTag())
-
 	t.Infof("Synchronization successfully from %s/%s:%s to %s/%s:%s", t.source.GetRegistry(), t.source.GetRepository(), t.source.GetTag(), t.destination.GetRegistry(), t.destination.GetRepository(), t.destination.GetTag())
 	return nil
 }

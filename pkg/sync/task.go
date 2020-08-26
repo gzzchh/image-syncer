@@ -40,7 +40,7 @@ func (t *Task) Run() error {
 	// get manifest from source
 	// 必须是带层的信息
 	manifestByte, manifestType, err := t.source.GetManifest()
-	//fmt.Println(manifestType)
+	//fmt.Println(manifestByte)
 	if err != nil {
 		return t.Errorf("Failed to get manifest from %s/%s:%s error: %v", t.source.GetRegistry(), t.source.GetRepository(), t.source.GetTag(), err)
 	}

@@ -82,6 +82,7 @@ func (i *ImageDestination) PushManifest(manifestByte []byte) error {
 	//if err != nil {
 	//	return err
 	//}
+	//fmt.Println(manifestByte)
 	return i.destination.PutManifest(i.ctx, manifestByte, nil)
 }
 

@@ -1,5 +1,5 @@
 # LCPP 外部镜像 腾讯云
-#caddy:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:caddy
-#percona/percona-server:8.0: ccr.ccs.tencentyun.com/gzzchh/stacks:percona-mysql-8
-library/redis:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:redis
-#neilpang/acme.sh:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:acmesh
+caddy:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:caddy
+percona/percona-server:8.0: ccr.ccs.tencentyun.com/gzzchh/stacks:percona-mysql-8
+redis:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:redis
+neilpang/acme.sh:latest: ccr.ccs.tencentyun.com/gzzchh/stacks:acmesh

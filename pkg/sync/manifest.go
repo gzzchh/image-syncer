@@ -49,16 +49,20 @@ func ManifestHandler(m []byte, t string, i *ImageSource) (manifest.Manifest, []*
 		for _, item := range manifestInfo.Manifests {
 			// 暂时至支持X86_64架构的镜像同步
 			if item.Platform.Architecture == "amd64" {
-				//fmt.Println("newCtx:", i.ctx)
-				//fmt.Println("newDigest:", item.Digest)
-				// 用指定Arch的Digest再拉一次针对该Digest的多层Manifest
-				manifestByte, manifestType, err := i.source.GetManifest(i.ctx, &item.Digest)
-				if err != nil {
-					return nil, nil, err
+				// For Linux Only
+				if item.Platform.OS == "linux" {
+					//fmt.Println("newCtx:", i.ctx)
+					//fmt.Println("newDigest:", item.Digest)
+					// 用指定Arch的Digest再拉一次针对该Digest的多层Manifest
+					manifestByte, manifestType, err := i.source.GetManifest(i.ctx, &item.Digest)
+					if err != nil {
+						return nil, nil, err
+					}
+					platformSpecManifest, _, err := ManifestHandler(manifestByte, manifestType, i)
+					//fmt.Println(platformSpecManifest)
+					return platformSpecManifest, nil, nil
 				}
-				platformSpecManifest, _, err := ManifestHandler(manifestByte, manifestType, i)
-				//fmt.Println(platformSpecManifest)
-				return platformSpecManifest, nil, nil
+
 			}
 		}
 		//fmt.Println(manifestInfo.Manifests)

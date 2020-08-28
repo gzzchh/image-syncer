@@ -87,18 +87,22 @@ func (t *Task) Run() error {
 		for _, item := range manifestInfo.Manifests {
 			// 暂时至支持X86_64架构的镜像同步
 			if item.Platform.Architecture == "amd64" {
-				//fmt.Println("newCtx:", i.ctx)
-				//fmt.Println("newDigest:", item.Digest)
-				// 用指定Arch的Digest再拉一次针对该Digest的多层Manifest
-				manifestByte, manifestType, err = t.source.source.GetManifest(t.source.ctx,&item.Digest)
-				if err != nil {
-					return err
+				if item.Platform.OS == "linux" {
+					//fmt.Println("newCtx:", i.ctx)
+					//fmt.Println("newDigest:", item.Digest)
+					// 用指定Arch的Digest再拉一次针对该Digest的多层Manifest
+					manifestByte, manifestType, err = t.source.source.GetManifest(t.source.ctx, &item.Digest)
+					if err != nil {
+						return err
+					}
 				}
+
 			}
 		}
 	}
 	// push manifest to destination
 	// 这里只能写入 镜像层的信息,如果是多Arch镜像必须修改
+	//fmt.Println(string(manifestByte))
 	if err := t.destination.PushManifest(manifestByte); err != nil {
 		return t.Errorf("Put manifest to %s/%s:%s error: %v", t.destination.GetRegistry(), t.destination.GetRepository(), t.destination.GetTag(), err)
 	}
